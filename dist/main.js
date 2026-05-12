@@ -13,6 +13,8 @@ const bgImage = new Image();
 bgImage.src = "imagenes/fondo oficina.jpg";
 const playerImg = new Image();
 playerImg.src = "imagenes/Caja_archivo_run_spritesheet.png";
+const folderImg = new Image();
+folderImg.src = "imagenes/folder.png";
 let scoreElement = document.getElementById("score");
 let missesElement = document.getElementById("misses");
 let timerElement = document.getElementById("timer");
@@ -220,8 +222,13 @@ class FallingObject {
         ctx.save();
         ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
         ctx.rotate(this.rotation);
-        ctx.fillStyle = "red";
-        ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        if (folderImg.complete && folderImg.naturalWidth > 0) {
+            ctx.drawImage(folderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
+        else {
+            ctx.fillStyle = "red";
+            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
         ctx.restore();
     }
     isCaught(player) {
@@ -246,8 +253,13 @@ class GoldenObject extends FallingObject {
         ctx.save();
         ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
         ctx.rotate(this.rotation);
-        ctx.fillStyle = "gold";
-        ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        if (folderImg.complete && folderImg.naturalWidth > 0) {
+            ctx.drawImage(folderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
+        else {
+            ctx.fillStyle = "gold";
+            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
         ctx.restore();
     }
     applyEffect(game) {
@@ -263,8 +275,13 @@ class BombObject extends FallingObject {
         ctx.save();
         ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
         ctx.rotate(this.rotation);
-        ctx.fillStyle = "black";
-        ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        if (folderImg.complete && folderImg.naturalWidth > 0) {
+            ctx.drawImage(folderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
+        else {
+            ctx.fillStyle = "black";
+            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
         ctx.restore();
     }
     applyEffect(game) {
