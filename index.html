@@ -10,6 +10,7 @@
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
         <div id="score-board">
+            <p id="timer-label">Time: <span id="timer">30</span></p>
             <p>Score: <span id="score">0</span></p>
             <p>Misses: <span id="misses">0</span></p>
         </div>
@@ -22,7 +23,26 @@
         </div>
         <div id="game-over-screen">
             <h2>Game Over!</h2>
-            <button id="restart-button">Restart</button>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <p>Final Misses: <span id="final-misses">0</span></p>
+            <div id="name-entry">
+                <p>Enter 3 initials:</p>
+                <input id="initials-input" type="text" maxlength="3" placeholder="AAA">
+                <button id="save-score-button">Save Score</button>
+            </div>
+            <h3>Arcade Scores</h3>
+            <table id="arcade-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>INI</th>
+                        <th>SCORE</th>
+                        <th>MISS</th>
+                    </tr>
+                </thead>
+                <tbody id="arcade-body"></tbody>
+            </table>
+            <button id="restart-button">Play Again</button>
             <p>High Score: <span id="final-high-score">0</span></p>
         </div>
     </div>
@@ -33,6 +53,6 @@
     <audio id="miss-sound" src="sounds/miss.mp3"></audio>
     <audio id="game-over-sound" src="sounds/game-over.mp3"></audio>
 
-    <script src="main.js" type="module"></script>
+    <script src="dist/main.js" type="module"></script>
 </body>
 </html>
