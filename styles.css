@@ -54,16 +54,15 @@ canvas {
 }
 
 
-#difficulty-selection {
+#high-score-panel {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 20;
-    background: rgba(40,44,52,0.95);
-    padding: 30px 50px;
-    border-radius: 16px;
-    display: none;
+    top: 18px;
+    right: 18px;
+    z-index: 10;
+    margin: 0;
+    background: rgba(40,44,52,0.7);
+    padding: 12px 18px;
+    border-radius: 10px;
 }
 
 #game-over-screen {

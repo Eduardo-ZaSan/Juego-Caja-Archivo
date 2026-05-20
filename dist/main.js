@@ -15,6 +15,8 @@ const playerImg = new Image();
 playerImg.src = "imagenes/Caja_archivo_run_spritesheet.png";
 const folderImg = new Image();
 folderImg.src = "imagenes/folder.png";
+const badFolderImg = new Image();
+badFolderImg.src = "imagenes/folder_n.png";
 let scoreElement = document.getElementById("score");
 let missesElement = document.getElementById("misses");
 let timerElement = document.getElementById("timer");
@@ -290,6 +292,28 @@ class BombObject extends FallingObject {
         bombSound.play(); // Play bomb sound
     }
 }
+class BadObject extends FallingObject {
+    constructor() {
+        super(Math.random() * 2 + 2, -1); // -1 punto
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
+        ctx.rotate(this.rotation);
+        if (badFolderImg.complete && badFolderImg.naturalWidth > 0) {
+            ctx.drawImage(badFolderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
+        else {
+            ctx.fillStyle = "#6b0000";
+            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        }
+        ctx.restore();
+    }
+    applyEffect(game) {
+        game.score += this.points;
+        bombSound.play();
+    }
+}
 // Game class with high score, sound effects, and difficulty
 class Game {
     constructor() {
@@ -330,6 +354,10 @@ class Game {
         }
         else if (rand < 0.002) {
             this.fallingObjects.push(new BombObject());
+        }
+        else if (rand < 0.202) {
+            // Aproximadamente 1 de cada 5 objetos sera negativo.
+            this.fallingObjects.push(new BadObject());
         }
         else {
             const objectSpeed = this.difficultyMultiplier * (Math.random() * 2 + 2);
@@ -439,24 +467,17 @@ class Game {
         document.getElementById("game-over-screen").style.display = "block";
     }
 }
-// Difficulty Selection and Game Initialization
-document.getElementById("easy-button").addEventListener("click", () => startGame(1));
-document.getElementById("medium-button").addEventListener("click", () => startGame(1.5));
-document.getElementById("hard-button").addEventListener("click", () => startGame(2));
-// Mostrar el selector de dificultad al cargar la página
+// Game initialization (hard mode only)
 window.addEventListener("DOMContentLoaded", () => {
-    const diffSel = document.getElementById("difficulty-selection");
-    if (diffSel)
-        diffSel.style.display = "block";
     const gameOverScreen = document.getElementById("game-over-screen");
     if (gameOverScreen)
         gameOverScreen.style.display = "none";
     timerElement.textContent = roundDurationSec.toString();
     renderArcadeScores();
+    startGame();
 });
-function startGame(speed) {
-    gameSpeed = speed; // Set the game speed based on difficulty
-    document.getElementById("difficulty-selection").style.display = "none";
+function startGame() {
+    gameSpeed = 2;
     document.getElementById("game-over-screen").style.display = "none";
     scoreElement.textContent = "0";
     missesElement.textContent = "0";
@@ -477,8 +498,5 @@ initialsInput.addEventListener("keydown", (event) => {
     }
 });
 document.getElementById("restart-button").addEventListener("click", () => {
-    document.getElementById("game-over-screen").style.display = "none";
-    const diffSel = document.getElementById("difficulty-selection");
-    if (diffSel)
-        diffSel.style.display = "block";
+    startGame();
 });
