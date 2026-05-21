@@ -78,6 +78,55 @@ canvas {
     min-width: 360px;
 }
 
+#game-over-image {
+    width: min(50vw, 680px);
+    max-height: 50vh;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 12px;
+    transform: scale(0.15);
+    opacity: 0;
+}
+
+#game-over-screen.visible #game-over-image {
+    animation: gameOverPop 450ms cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+#game-over-details {
+    display: none;
+}
+
+#game-over-screen.phase-image #game-over-image {
+    display: block;
+}
+
+#game-over-screen.phase-image #game-over-details {
+    display: none;
+}
+
+#game-over-screen.phase-details #game-over-image {
+    display: none;
+}
+
+#game-over-screen.phase-details #game-over-details {
+    display: block;
+}
+
+@keyframes gameOverPop {
+    0% {
+        transform: scale(0.15);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.06);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 #name-entry {
     margin: 10px 0 16px;
 }

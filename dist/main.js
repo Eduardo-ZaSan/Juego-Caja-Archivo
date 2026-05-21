@@ -27,6 +27,7 @@ let finalMissesElement = document.getElementById("final-misses");
 let initialsInput = document.getElementById("initials-input");
 let saveScoreButton = document.getElementById("save-score-button");
 let arcadeBody = document.getElementById("arcade-body");
+let gameOverPhaseTimeoutId = null;
 const playerWidth = 120;
 const playerHeight = 110;
 const objectWidth = 40;
@@ -355,8 +356,8 @@ class Game {
         else if (rand < 0.002) {
             this.fallingObjects.push(new BombObject());
         }
-        else if (rand < 0.202) {
-            // Aproximadamente 1 de cada 5 objetos sera negativo.
+        else if (rand < 0.452) {
+            // Mayor frecuencia de objetos negativos (~45%).
             this.fallingObjects.push(new BadObject());
         }
         else {
@@ -365,9 +366,6 @@ class Game {
         }
     }
     createObject(currentTime) {
-        if (this.fallingObjects.length >= 3) {
-            return;
-        }
         const forcedSpawn = currentTime - this.lastSpawnTime >= this.minSpawnIntervalMs;
         const randomSpawn = Math.random() < 0.02;
         if (forcedSpawn || randomSpawn) {
@@ -464,21 +462,43 @@ class Game {
         finalHighScoreElement.textContent = this.highScore.toString();
     }
     showGameOverScreen() {
-        document.getElementById("game-over-screen").style.display = "block";
+        const gameOverScreen = document.getElementById("game-over-screen");
+        if (gameOverPhaseTimeoutId !== null) {
+            clearTimeout(gameOverPhaseTimeoutId);
+            gameOverPhaseTimeoutId = null;
+        }
+        gameOverScreen.style.display = "block";
+        gameOverScreen.classList.remove("visible", "phase-details");
+        gameOverScreen.classList.add("phase-image");
+        void gameOverScreen.offsetWidth;
+        gameOverScreen.classList.add("visible");
+        gameOverPhaseTimeoutId = window.setTimeout(() => {
+            gameOverScreen.classList.remove("phase-image");
+            gameOverScreen.classList.add("phase-details");
+            gameOverPhaseTimeoutId = null;
+        }, 2000);
     }
 }
 // Game initialization (hard mode only)
 window.addEventListener("DOMContentLoaded", () => {
     const gameOverScreen = document.getElementById("game-over-screen");
-    if (gameOverScreen)
+    if (gameOverScreen) {
         gameOverScreen.style.display = "none";
+        gameOverScreen.classList.remove("visible", "phase-image", "phase-details");
+    }
     timerElement.textContent = roundDurationSec.toString();
     renderArcadeScores();
     startGame();
 });
 function startGame() {
     gameSpeed = 2;
-    document.getElementById("game-over-screen").style.display = "none";
+    const gameOverScreen = document.getElementById("game-over-screen");
+    if (gameOverPhaseTimeoutId !== null) {
+        clearTimeout(gameOverPhaseTimeoutId);
+        gameOverPhaseTimeoutId = null;
+    }
+    gameOverScreen.style.display = "none";
+    gameOverScreen.classList.remove("visible", "phase-image", "phase-details");
     scoreElement.textContent = "0";
     missesElement.textContent = "0";
     timerElement.textContent = roundDurationSec.toString();

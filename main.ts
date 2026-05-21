@@ -29,6 +29,7 @@ let finalMissesElement = document.getElementById("final-misses")!;
 let initialsInput = document.getElementById("initials-input") as HTMLInputElement;
 let saveScoreButton = document.getElementById("save-score-button") as HTMLButtonElement;
 let arcadeBody = document.getElementById("arcade-body") as HTMLTableSectionElement;
+let gameOverPhaseTimeoutId: number | null = null;
 
 
 const playerWidth = 120;
@@ -440,8 +441,8 @@ class Game {
             this.fallingObjects.push(new GoldenObject());
         } else if (rand < 0.002) {
             this.fallingObjects.push(new BombObject());
-        } else if (rand < 0.202) {
-            // Aproximadamente 1 de cada 5 objetos sera negativo.
+        } else if (rand < 0.452) {
+            // Mayor frecuencia de objetos negativos (~45%).
             this.fallingObjects.push(new BadObject());
         } else {
             const objectSpeed = this.difficultyMultiplier * (Math.random() * 2 + 2);
@@ -450,10 +451,6 @@ class Game {
     }
 
     createObject(currentTime: number) {
-        if (this.fallingObjects.length >= 3) {
-            return;
-        }
-
         const forcedSpawn = currentTime - this.lastSpawnTime >= this.minSpawnIntervalMs;
         const randomSpawn = Math.random() < 0.02;
 
@@ -564,14 +561,34 @@ class Game {
     }
 
     showGameOverScreen() {
-        document.getElementById("game-over-screen")!.style.display = "block";
+        const gameOverScreen = document.getElementById("game-over-screen")!;
+
+        if (gameOverPhaseTimeoutId !== null) {
+            clearTimeout(gameOverPhaseTimeoutId);
+            gameOverPhaseTimeoutId = null;
+        }
+
+        gameOverScreen.style.display = "block";
+        gameOverScreen.classList.remove("visible", "phase-details");
+        gameOverScreen.classList.add("phase-image");
+        void gameOverScreen.offsetWidth;
+        gameOverScreen.classList.add("visible");
+
+        gameOverPhaseTimeoutId = window.setTimeout(() => {
+            gameOverScreen.classList.remove("phase-image");
+            gameOverScreen.classList.add("phase-details");
+            gameOverPhaseTimeoutId = null;
+        }, 2000);
     }
 }
 
 // Game initialization (hard mode only)
 window.addEventListener("DOMContentLoaded", () => {
     const gameOverScreen = document.getElementById("game-over-screen");
-    if (gameOverScreen) gameOverScreen.style.display = "none";
+    if (gameOverScreen) {
+        gameOverScreen.style.display = "none";
+        gameOverScreen.classList.remove("visible", "phase-image", "phase-details");
+    }
     timerElement.textContent = roundDurationSec.toString();
     renderArcadeScores();
     startGame();
@@ -579,7 +596,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function startGame() {
     gameSpeed = 2;
-    document.getElementById("game-over-screen")!.style.display = "none";
+    const gameOverScreen = document.getElementById("game-over-screen")!;
+
+    if (gameOverPhaseTimeoutId !== null) {
+        clearTimeout(gameOverPhaseTimeoutId);
+        gameOverPhaseTimeoutId = null;
+    }
+
+    gameOverScreen.style.display = "none";
+    gameOverScreen.classList.remove("visible", "phase-image", "phase-details");
     scoreElement.textContent = "0";
     missesElement.textContent = "0";
     timerElement.textContent = roundDurationSec.toString();
