@@ -11,7 +11,7 @@ window.addEventListener("resize", resizeCanvas);
 
 // Load background and player images
 const bgImage = new Image();
-bgImage.src = "imagenes/fondo oficina.jpg";
+bgImage.src = "imagenes/fondo oficina2.png";
 const playerIdleImg = new Image();
 playerIdleImg.src = "imagenes/Caja_archivo.png";
 const playerRunFrames: HTMLImageElement[] = Array.from({ length: 8 }, (_, index) => {
@@ -523,13 +523,8 @@ class Game {
     }
 
     draw() {
-        // Dibuja el fondo de la oficina.
-        if (bgImage.complete && bgImage.naturalWidth > 0) {
-            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-        } else {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         this.player.draw();
         this.fallingObjects.forEach((obj) => {
             obj.draw();
