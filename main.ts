@@ -36,7 +36,7 @@ const positiveObjectImages: HTMLImageElement[] = [
     createImageAsset("imagenes/Clip.png"),
     createImageAsset("imagenes/Despachador.png"),
     createImageAsset("imagenes/Estrella.png"),
-    createImageAsset("imagenes/Folder.png"),
+    createImageAsset("imagenes/folder.png"),
     createImageAsset("imagenes/Hoja blanca.png"),
     createImageAsset("imagenes/Nube.png"),
     createImageAsset("imagenes/regla.png"),
