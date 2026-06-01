@@ -12,35 +12,29 @@
         <div id="score-board">
             <p id="timer-label">Tiempo: <span id="timer">30</span></p>
             <p>Puntuación: <span id="score">0</span></p>
-            <p>Fallos: <span id="misses">0</span></p>
         </div>
         <p id="high-score-panel">Puntuación Máxima: <span id="high-score">0</span></p>
         <div id="game-over-screen">
-            <img id="game-over-image" src="imagenes/GameOver.png" alt="Game Over">
-            <div id="game-over-details">
-                <h2>¡Juego Terminado!</h2>
-                <p>Puntuación Final: <span id="final-score">0</span></p>
-                <p>Fallos Finales: <span id="final-misses">0</span></p>
-                <div id="name-entry">
-                    <p>Ingresa 3 iniciales:</p>
-                    <input id="initials-input" type="text" maxlength="3" placeholder="AAA">
-                    <button id="save-score-button">Guardar Puntuación</button>
-                </div>
-                <h3>Puntuaciones del Arcade</h3>
-                <table id="arcade-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>INI</th>
-                            <th>PUNTUACIÓN</th>
-                            <th>FALLOS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="arcade-body"></tbody>
-                </table>
-                <button id="restart-button">Jugar de Nuevo</button>
-                <p>Puntuación Máxima: <span id="final-high-score">0</span></p>
+            <h2>¡Juego Terminado!</h2>
+            <p>Puntuación Final: <span id="final-score">0</span></p>
+            <div id="name-entry">
+                <p>Ingresa tu nombre:</p>
+                <input id="initials-input" type="text" maxlength="30" placeholder="Tu nombre">
+                <button id="save-score-button">Guardar Puntuación</button>
             </div>
+            <h3>Puntuaciones del Arcade</h3>
+            <table id="arcade-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>NOMBRE</th>
+                        <th>PUNTUACIÓN</th>
+                    </tr>
+                </thead>
+                <tbody id="arcade-body"></tbody>
+            </table>
+            <button id="restart-button">Jugar de Nuevo</button>
+            <p>Puntuación Máxima: <span id="final-high-score">0</span></p>
         </div>
     </div>
     <!-- Sound effects -->

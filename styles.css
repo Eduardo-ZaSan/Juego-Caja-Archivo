@@ -132,12 +132,11 @@ canvas {
 }
 
 #initials-input {
-    width: 90px;
+    width: 240px;
     padding: 8px;
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 20px;
-    letter-spacing: 2px;
+    text-align: left;
+    font-size: 16px;
+    letter-spacing: normal;
 }
 
 #arcade-table {

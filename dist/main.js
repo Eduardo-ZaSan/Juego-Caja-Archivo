@@ -11,41 +11,63 @@ window.addEventListener("resize", resizeCanvas);
 // Load background and player images
 const bgImage = new Image();
 bgImage.src = "imagenes/fondo oficina.jpg";
-const playerImg = new Image();
-playerImg.src = "imagenes/Caja_archivo_run_spritesheet.png";
-const folderImg = new Image();
-folderImg.src = "imagenes/folder.png";
-const badFolderImg = new Image();
-badFolderImg.src = "imagenes/folder_n.png";
+const playerIdleImg = new Image();
+playerIdleImg.src = "imagenes/Caja_archivo.png";
+const playerRunFrames = Array.from({ length: 8 }, (_, index) => {
+    const frame = new Image();
+    frame.src = `imagenes/Animacion caja/Caja-${index + 1}.png`;
+    return frame;
+});
+function createImageAsset(src) {
+    const img = new Image();
+    img.src = src;
+    return img;
+}
+function pickRandomImage(pool) {
+    if (pool.length === 0)
+        return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+const positiveObjectImages = [
+    createImageAsset("imagenes/Clip mariposa.png"),
+    createImageAsset("imagenes/Clip.png"),
+    createImageAsset("imagenes/Despachador.png"),
+    createImageAsset("imagenes/Estrella.png"),
+    createImageAsset("imagenes/Folder.png"),
+    createImageAsset("imagenes/Hoja blanca.png"),
+    createImageAsset("imagenes/Nube.png"),
+    createImageAsset("imagenes/regla.png"),
+    createImageAsset("imagenes/Sobre.png")
+];
+const negativeObjectImages = [
+    createImageAsset("imagenes/Pin.png"),
+    createImageAsset("imagenes/Rayo.png"),
+    createImageAsset("imagenes/sacapuntas.png"),
+    createImageAsset("imagenes/Tijeras.png"),
+    createImageAsset("imagenes/viruta de lapiz.png")
+];
+const clockObjectImage = createImageAsset("imagenes/Reloj.png");
 let scoreElement = document.getElementById("score");
-let missesElement = document.getElementById("misses");
 let timerElement = document.getElementById("timer");
 let highScoreElement = document.getElementById("high-score");
 let finalHighScoreElement = document.getElementById("final-high-score");
 let finalScoreElement = document.getElementById("final-score");
-let finalMissesElement = document.getElementById("final-misses");
 let initialsInput = document.getElementById("initials-input");
 let saveScoreButton = document.getElementById("save-score-button");
 let arcadeBody = document.getElementById("arcade-body");
 let gameOverPhaseTimeoutId = null;
 const playerWidth = 120;
 const playerHeight = 110;
-const objectWidth = 40;
-const objectHeight = 40;
+const objectWidth = 64;
+const objectHeight = 64;
 let gameSpeed = 1; // Multiplier for difficulty levels
 const roundDurationSec = 30;
 const arcadeScoresKey = "arcadeScores";
 const maxArcadeEntries = 10;
 let pendingArcadeScore = null;
 function normalizeInitials(value) {
-    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
-    if (cleaned.length >= 3)
-        return cleaned;
-    if (cleaned.length === 2)
-        return `${cleaned}A`;
-    if (cleaned.length === 1)
-        return `${cleaned}AA`;
-    return "AAA";
+    const cleaned = value.trim();
+    return cleaned.length > 0 ? cleaned.slice(0, 30) : "Anónimo";
 }
 function loadArcadeScores() {
     const raw = localStorage.getItem(arcadeScoresKey);
@@ -67,13 +89,13 @@ function renderArcadeScores() {
     const entries = loadArcadeScores();
     if (entries.length === 0) {
         const row = document.createElement("tr");
-        row.innerHTML = "<td colspan=\"4\">No scores yet</td>";
+        row.innerHTML = "<td colspan=\"3\">No scores yet</td>";
         arcadeBody.appendChild(row);
         return;
     }
     entries.forEach((entry, index) => {
         const row = document.createElement("tr");
-        row.innerHTML = `<td>${index + 1}</td><td>${entry.initials}</td><td>${entry.score}</td><td>${entry.misses}</td>`;
+        row.innerHTML = `<td>${index + 1}</td><td>${entry.initials}</td><td>${entry.score}</td>`;
         arcadeBody.appendChild(row);
     });
 }
@@ -85,14 +107,11 @@ function savePendingArcadeScore() {
     entries.push({
         initials,
         score: pendingArcadeScore.score,
-        misses: pendingArcadeScore.misses,
         createdAt: Date.now()
     });
     entries.sort((a, b) => {
         if (b.score !== a.score)
             return b.score - a.score;
-        if (a.misses !== b.misses)
-            return a.misses - b.misses;
         return a.createdAt - b.createdAt;
     });
     saveArcadeScores(entries.slice(0, maxArcadeEntries));
@@ -134,10 +153,8 @@ class Player {
         this.facingDirection = 1;
     }
     canUseSpriteAnimation() {
-        return (playerImg.complete &&
-            playerImg.naturalWidth > 0 &&
-            playerImg.naturalHeight > 0 &&
-            playerImg.naturalWidth >= this.runFrameCount * playerImg.naturalHeight);
+        return playerRunFrames.length >= this.runFrameCount &&
+            playerRunFrames.every((frame) => frame.complete && frame.naturalWidth > 0 && frame.naturalHeight > 0);
     }
     updateFrameAnimation(isMoving) {
         if (!isMoving) {
@@ -183,9 +200,7 @@ class Player {
     }
     draw() {
         if (this.canUseSpriteAnimation()) {
-            const sourceWidth = playerImg.naturalWidth / this.runFrameCount;
-            const sourceHeight = playerImg.naturalHeight;
-            const sx = this.currentFrame * sourceWidth;
+            const frameImg = playerRunFrames[this.currentFrame] || playerRunFrames[0];
             const centerX = this.x + playerWidth / 2;
             const centerY = this.y + playerHeight / 2;
             ctx.save();
@@ -193,7 +208,7 @@ class Player {
             if (this.facingDirection === -1) {
                 ctx.scale(-1, 1);
             }
-            ctx.drawImage(playerImg, sx, 0, sourceWidth, sourceHeight, -playerWidth / 2, -playerHeight / 2, playerWidth, playerHeight);
+            ctx.drawImage(frameImg, -playerWidth / 2, -playerHeight / 2, playerWidth, playerHeight);
             ctx.restore();
             return;
         }
@@ -204,18 +219,26 @@ class Player {
         ctx.translate(centerX, centerY);
         ctx.rotate(this.tilt);
         ctx.scale(this.visualScaleX, this.visualScaleY);
-        ctx.drawImage(playerImg, -playerWidth / 2, -playerHeight / 2, playerWidth, playerHeight);
+        if (playerIdleImg.complete && playerIdleImg.naturalWidth > 0) {
+            ctx.drawImage(playerIdleImg, -playerWidth / 2, -playerHeight / 2, playerWidth, playerHeight);
+        }
+        else {
+            ctx.fillStyle = "#1f4d7a";
+            ctx.fillRect(-playerWidth / 2, -playerHeight / 2, playerWidth, playerHeight);
+        }
         ctx.restore();
     }
 }
 class FallingObject {
-    constructor(initialSpeed, points = 1) {
+    constructor(initialSpeed, points = 1, spritePool = positiveObjectImages, fallbackColor = "red") {
         this.x = Math.random() * (canvas.width - objectWidth);
         this.y = -objectHeight;
         this.speed = initialSpeed * gameSpeed;
         this.points = points;
         this.rotation = 0;
         this.rotationSpeed = (Math.random() * 0.08 + 0.03) * (Math.random() < 0.5 ? -1 : 1);
+        this.sprite = pickRandomImage(spritePool);
+        this.fallbackColor = fallbackColor;
     }
     fall() {
         this.y += this.speed;
@@ -225,11 +248,11 @@ class FallingObject {
         ctx.save();
         ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
         ctx.rotate(this.rotation);
-        if (folderImg.complete && folderImg.naturalWidth > 0) {
-            ctx.drawImage(folderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+        if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
+            ctx.drawImage(this.sprite, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
         }
         else {
-            ctx.fillStyle = "red";
+            ctx.fillStyle = this.fallbackColor;
             ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
         }
         ctx.restore();
@@ -250,20 +273,7 @@ class FallingObject {
 // Special object classes: GoldenObject and BombObject
 class GoldenObject extends FallingObject {
     constructor() {
-        super(Math.random() * 2 + 2, 5); // 5 points for GoldenObject
-    }
-    draw() {
-        ctx.save();
-        ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
-        ctx.rotate(this.rotation);
-        if (folderImg.complete && folderImg.naturalWidth > 0) {
-            ctx.drawImage(folderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
-        }
-        else {
-            ctx.fillStyle = "gold";
-            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
-        }
-        ctx.restore();
+        super(Math.random() * 1 + 1.5, 5, positiveObjectImages, "gold"); // 5 points for GoldenObject, caida lenta
     }
     applyEffect(game) {
         game.score += this.points;
@@ -271,48 +281,31 @@ class GoldenObject extends FallingObject {
     }
 }
 class BombObject extends FallingObject {
-    constructor() {
-        super(Math.random() * 2 + 2, -3); // -3 points for BombObject
-    }
-    draw() {
-        ctx.save();
-        ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
-        ctx.rotate(this.rotation);
-        if (folderImg.complete && folderImg.naturalWidth > 0) {
-            ctx.drawImage(folderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
-        }
-        else {
-            ctx.fillStyle = "black";
-            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
-        }
-        ctx.restore();
+    constructor(speed = Math.random() * 2 + 3) {
+        super(speed, -3, negativeObjectImages, "black"); // -3 points for BombObject, caida rapida
     }
     applyEffect(game) {
         game.score += this.points;
-        game.misses++; // Increment misses
         bombSound.play(); // Play bomb sound
     }
 }
 class BadObject extends FallingObject {
-    constructor() {
-        super(Math.random() * 2 + 2, -1); // -1 punto
-    }
-    draw() {
-        ctx.save();
-        ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
-        ctx.rotate(this.rotation);
-        if (badFolderImg.complete && badFolderImg.naturalWidth > 0) {
-            ctx.drawImage(badFolderImg, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
-        }
-        else {
-            ctx.fillStyle = "#6b0000";
-            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
-        }
-        ctx.restore();
+    constructor(speed = Math.random() * 2 + 3) {
+        super(speed, -1, negativeObjectImages, "#6b0000"); // -1 punto, caida rapida
     }
     applyEffect(game) {
         game.score += this.points;
         bombSound.play();
+    }
+}
+class ClockObject extends FallingObject {
+    constructor() {
+        super(Math.random() * 1 + 1.5, 1, [clockObjectImage], "#1d4ed8"); // caida lenta
+    }
+    applyEffect(game) {
+        game.score += this.points;
+        game.addExtraTime(5);
+        catchSound.play();
     }
 }
 // Game class with high score, sound effects, and difficulty
@@ -321,12 +314,11 @@ class Game {
         this.player = new Player();
         this.fallingObjects = [];
         this.score = 0;
-        this.misses = 0;
         this.gameOver = false;
         this.difficultyMultiplier = 1;
         this.highScore = this.loadHighScore();
         this.lastSpawnTime = performance.now();
-        this.minSpawnIntervalMs = 1000;
+        this.minSpawnIntervalMs = 650;
         this.startTimeMs = performance.now();
         this.roundDurationMs = roundDurationSec * 1000;
         this.timeLeftSec = roundDurationSec;
@@ -350,24 +342,31 @@ class Game {
     }
     spawnRandomObject() {
         const rand = Math.random();
+        // Velocidad lenta para positivos (sin multiplicador de dificultad).
+        const slowSpeed = Math.random() * 1 + 1.5;
+        // Velocidad rapida para negativos (escala con dificultad).
+        const fastSpeed = this.difficultyMultiplier * (Math.random() * 2 + 3);
         if (rand < 0.001) {
             this.fallingObjects.push(new GoldenObject());
         }
         else if (rand < 0.002) {
-            this.fallingObjects.push(new BombObject());
+            this.fallingObjects.push(new BombObject(fastSpeed));
         }
-        else if (rand < 0.452) {
+        else if (rand < 0.03) {
+            // Reloj raro: +10s de tiempo al atraparlo.
+            this.fallingObjects.push(new ClockObject());
+        }
+        else if (rand < 0.48) {
             // Mayor frecuencia de objetos negativos (~45%).
-            this.fallingObjects.push(new BadObject());
+            this.fallingObjects.push(new BadObject(fastSpeed));
         }
         else {
-            const objectSpeed = this.difficultyMultiplier * (Math.random() * 2 + 2);
-            this.fallingObjects.push(new FallingObject(objectSpeed));
+            this.fallingObjects.push(new FallingObject(slowSpeed));
         }
     }
     createObject(currentTime) {
         const forcedSpawn = currentTime - this.lastSpawnTime >= this.minSpawnIntervalMs;
-        const randomSpawn = Math.random() < 0.02;
+        const randomSpawn = Math.random() < 0.05;
         if (forcedSpawn || randomSpawn) {
             this.spawnRandomObject();
             this.lastSpawnTime = currentTime;
@@ -378,13 +377,19 @@ class Game {
             this.difficultyMultiplier += 0.2;
         }
     }
+    addExtraTime(seconds) {
+        this.roundDurationMs += seconds * 1000;
+        const now = performance.now();
+        const remainingMs = Math.max(0, this.roundDurationMs - (now - this.startTimeMs));
+        this.timeLeftSec = Math.ceil(remainingMs / 1000);
+        timerElement.textContent = this.timeLeftSec.toString();
+    }
     finishRound() {
         this.gameOver = true;
         this.checkHighScore();
         gameOverSound.play();
-        pendingArcadeScore = { score: this.score, misses: this.misses };
+        pendingArcadeScore = { score: this.score };
         finalScoreElement.textContent = this.score.toString();
-        finalMissesElement.textContent = this.misses.toString();
         initialsInput.value = "";
         saveScoreButton.disabled = false;
         renderArcadeScores();
@@ -414,20 +419,19 @@ class Game {
             }
             else if (obj.isOutOfBounds()) {
                 this.fallingObjects.splice(index, 1);
-                this.misses++;
-                missesElement.textContent = this.misses.toString();
                 missSound.play(); // Play miss sound
             }
         });
         this.createObject(now);
     }
     draw() {
-        // Dibuja el fondo
-        if (bgImage.complete) {
+        // Dibuja el fondo de la oficina.
+        if (bgImage.complete && bgImage.naturalWidth > 0) {
             ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         }
         else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         this.player.draw();
         this.fallingObjects.forEach((obj) => {
@@ -481,6 +485,11 @@ class Game {
 }
 // Game initialization (hard mode only)
 window.addEventListener("DOMContentLoaded", () => {
+    // Reinicia una vez el ranking guardado para empezar desde cero.
+    if (localStorage.getItem("arcadeScoresReset_v1") !== "1") {
+        localStorage.removeItem(arcadeScoresKey);
+        localStorage.setItem("arcadeScoresReset_v1", "1");
+    }
     const gameOverScreen = document.getElementById("game-over-screen");
     if (gameOverScreen) {
         gameOverScreen.style.display = "none";
@@ -500,7 +509,6 @@ function startGame() {
     gameOverScreen.style.display = "none";
     gameOverScreen.classList.remove("visible", "phase-image", "phase-details");
     scoreElement.textContent = "0";
-    missesElement.textContent = "0";
     timerElement.textContent = roundDurationSec.toString();
     pendingArcadeScore = null;
     const game = new Game();
@@ -510,7 +518,9 @@ saveScoreButton.addEventListener("click", () => {
     savePendingArcadeScore();
 });
 initialsInput.addEventListener("input", () => {
-    initialsInput.value = initialsInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 3);
+    if (initialsInput.value.length > 30) {
+        initialsInput.value = initialsInput.value.slice(0, 30);
+    }
 });
 initialsInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
