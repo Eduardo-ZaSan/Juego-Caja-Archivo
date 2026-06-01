@@ -56,10 +56,11 @@ let initialsInput = document.getElementById("initials-input");
 let saveScoreButton = document.getElementById("save-score-button");
 let arcadeBody = document.getElementById("arcade-body");
 let gameOverPhaseTimeoutId = null;
-const playerWidth = 120;
-const playerHeight = 110;
-const objectWidth = 64;
-const objectHeight = 64;
+const playerWidth = 132;
+const playerHeight = 122;
+const objectWidth = 60;
+const objectHeight = 60;
+const playerBottomMargin = 150;
 let gameSpeed = 1; // Multiplier for difficulty levels
 const roundDurationSec = 30;
 const arcadeScoresKey = "arcadeScores";
@@ -141,7 +142,7 @@ class Player {
         this.visualScaleX = 1;
         this.visualScaleY = 1;
         this.x = canvas.width / 2 - playerWidth / 2;
-        this.y = canvas.height - playerHeight - 40;
+        this.y = canvas.height - playerHeight - playerBottomMargin;
         this.speed = Math.max(6, Math.floor(window.innerWidth * 0.0019)) * gameSpeed;
     }
     moveLeft() {
@@ -178,7 +179,7 @@ class Player {
         if (this.movingRight)
             this.moveRight();
         // Mantiene la barra en el piso visual incluso si cambia el tamano de ventana.
-        this.y = canvas.height - playerHeight - 40;
+        this.y = canvas.height - playerHeight - playerBottomMargin;
         if (this.canUseSpriteAnimation()) {
             this.updateFrameAnimation(isMoving);
             return;
@@ -342,10 +343,10 @@ class Game {
     }
     spawnRandomObject() {
         const rand = Math.random();
-        // Velocidad lenta para positivos (sin multiplicador de dificultad).
-        const slowSpeed = Math.random() * 1 + 1.5;
-        // Velocidad rapida para negativos (escala con dificultad).
-        const fastSpeed = this.difficultyMultiplier * (Math.random() * 2 + 3);
+        // Velocidad un poco mas rapida para positivos (sin multiplicador de dificultad).
+        const slowSpeed = Math.random() * 1.1 + 1.9;
+        // Velocidad mas suave para negativos (escala con dificultad).
+        const fastSpeed = this.difficultyMultiplier * (Math.random() * 1.3 + 2.1);
         if (rand < 0.001) {
             this.fallingObjects.push(new GoldenObject());
         }
@@ -356,7 +357,7 @@ class Game {
             // Reloj raro: +10s de tiempo al atraparlo.
             this.fallingObjects.push(new ClockObject());
         }
-        else if (rand < 0.48) {
+        else if (rand < 0.42) {
             // Mayor frecuencia de objetos negativos (~45%).
             this.fallingObjects.push(new BadObject(fastSpeed));
         }
@@ -425,8 +426,13 @@ class Game {
         this.createObject(now);
     }
     draw() {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        if (bgImage.complete && bgImage.naturalWidth > 0) {
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        }
+        else {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
         this.player.draw();
         this.fallingObjects.forEach((obj) => {
             obj.draw();
