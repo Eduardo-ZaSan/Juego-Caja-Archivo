@@ -267,7 +267,7 @@ class FallingObject {
     }
     applyEffect(game) {
         game.score += this.points;
-        catchSound.play(); // Play catch sound for normal objects
+        catchSound.play().catch(() => { }); // Play catch sound for normal objects
     }
 }
 // Special object classes: GoldenObject and BombObject
@@ -277,7 +277,7 @@ class GoldenObject extends FallingObject {
     }
     applyEffect(game) {
         game.score += this.points;
-        goldenSound.play(); // Play golden sound
+        goldenSound.play().catch(() => { }); // Play golden sound
     }
 }
 class BombObject extends FallingObject {
@@ -286,7 +286,7 @@ class BombObject extends FallingObject {
     }
     applyEffect(game) {
         game.score += this.points;
-        bombSound.play(); // Play bomb sound
+        bombSound.play().catch(() => { }); // Play bomb sound
     }
 }
 class BadObject extends FallingObject {
@@ -295,7 +295,7 @@ class BadObject extends FallingObject {
     }
     applyEffect(game) {
         game.score += this.points;
-        bombSound.play();
+        bombSound.play().catch(() => { });
     }
 }
 class ClockObject extends FallingObject {
@@ -305,7 +305,7 @@ class ClockObject extends FallingObject {
     applyEffect(game) {
         game.score += this.points;
         game.addExtraTime(5);
-        catchSound.play();
+        catchSound.play().catch(() => { });
     }
 }
 // Game class with high score, sound effects, and difficulty
@@ -387,7 +387,7 @@ class Game {
     finishRound() {
         this.gameOver = true;
         this.checkHighScore();
-        gameOverSound.play();
+        gameOverSound.play().catch(() => { });
         pendingArcadeScore = { score: this.score };
         finalScoreElement.textContent = this.score.toString();
         initialsInput.value = "";
@@ -419,7 +419,7 @@ class Game {
             }
             else if (obj.isOutOfBounds()) {
                 this.fallingObjects.splice(index, 1);
-                missSound.play(); // Play miss sound
+                missSound.play().catch(() => { }); // Play miss sound
             }
         });
         this.createObject(now);
