@@ -10,7 +10,7 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 // Load background and player images
 const bgImage = new Image();
-bgImage.src = "imagenes/fondo oficina2.png";
+bgImage.src = "imagenes/fondo3.jpeg";
 const playerIdleImg = new Image();
 playerIdleImg.src = "imagenes/Caja_archivo.png";
 const playerRunFrames = Array.from({ length: 8 }, (_, index) => {
@@ -52,8 +52,8 @@ let initialsInput = document.getElementById("initials-input");
 let saveScoreButton = document.getElementById("save-score-button");
 let arcadeBody = document.getElementById("arcade-body");
 let gameOverPhaseTimeoutId = null;
-const playerWidth = 99;
-const playerHeight = 92;
+const playerWidth = 297;
+const playerHeight = 276;
 const objectWidth = 60;
 const objectHeight = 60;
 const playerBottomMargin = 150;

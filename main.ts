@@ -11,7 +11,7 @@ window.addEventListener("resize", resizeCanvas);
 
 // Load background and player images
 const bgImage = new Image();
-bgImage.src = "imagenes/fondo oficina2.png";
+bgImage.src = "imagenes/fondo3.jpeg";
 const playerIdleImg = new Image();
 playerIdleImg.src = "imagenes/Caja_archivo.png";
 const playerRunFrames: HTMLImageElement[] = Array.from({ length: 8 }, (_, index) => {
@@ -60,8 +60,8 @@ let arcadeBody = document.getElementById("arcade-body") as HTMLTableSectionEleme
 let gameOverPhaseTimeoutId: number | null = null;
 
 
-const playerWidth = 99;
-const playerHeight = 92;
+const playerWidth = 297;
+const playerHeight = 276;
 const objectWidth = 60;
 const objectHeight = 60;
 const playerBottomMargin = 150;

@@ -1,0 +1,26 @@
+{
+  "name": "juego-caja-archivo",
+  "version": "1.0.0",
+  "description": "Welcome to the **Catch the Falling Objects Game**! This is a fun and interactive game where players catch falling objects to score points.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eduardo-ZaSan/Juego-Caja-Archivo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Eduardo-ZaSan/Juego-Caja-Archivo/issues"
+  },
+  "homepage": "https://github.com/Eduardo-ZaSan/Juego-Caja-Archivo#readme",
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}
