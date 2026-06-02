@@ -62,7 +62,7 @@ const objectWidth = 60;
 const objectHeight = 60;
 const playerBottomMargin = 150;
 let gameSpeed = 1; // Multiplier for difficulty levels
-const roundDurationSec = 30;
+const roundDurationSec = 60;
 const arcadeScoresKey = "arcadeScores";
 const maxArcadeEntries = 10;
 let pendingArcadeScore = null;
@@ -231,9 +231,11 @@ class Player {
     }
 }
 class FallingObject {
-    constructor(initialSpeed, points = 1, spritePool = positiveObjectImages, fallbackColor = "red") {
-        this.x = Math.random() * (canvas.width - objectWidth);
-        this.y = -objectHeight;
+    constructor(initialSpeed, points = 1, spritePool = positiveObjectImages, fallbackColor = "red", sizeMultiplier = 1) {
+        this.width = objectWidth * sizeMultiplier;
+        this.height = objectHeight * sizeMultiplier;
+        this.x = Math.random() * (canvas.width - this.width);
+        this.y = -this.height;
         this.speed = initialSpeed * gameSpeed;
         this.points = points;
         this.rotation = 0;
@@ -247,21 +249,21 @@ class FallingObject {
     }
     draw() {
         ctx.save();
-        ctx.translate(this.x + objectWidth / 2, this.y + objectHeight / 2);
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
         ctx.rotate(this.rotation);
         if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
-            ctx.drawImage(this.sprite, -objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+            ctx.drawImage(this.sprite, -this.width / 2, -this.height / 2, this.width, this.height);
         }
         else {
             ctx.fillStyle = this.fallbackColor;
-            ctx.fillRect(-objectWidth / 2, -objectHeight / 2, objectWidth, objectHeight);
+            ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
         }
         ctx.restore();
     }
     isCaught(player) {
-        return (this.y + objectHeight > player.y &&
+        return (this.y + this.height > player.y &&
             this.x < player.x + playerWidth &&
-            this.x + objectWidth > player.x);
+            this.x + this.width > player.x);
     }
     isOutOfBounds() {
         return this.y > canvas.height;
@@ -283,19 +285,19 @@ class GoldenObject extends FallingObject {
 }
 class BombObject extends FallingObject {
     constructor(speed = Math.random() * 2 + 3) {
-        super(speed, -3, negativeObjectImages, "black"); // -3 points for BombObject, caida rapida
+        super(speed, 0, negativeObjectImages, "black", 1.35); // Objeto malo mas grande
     }
     applyEffect(game) {
-        game.score += this.points;
+        game.addExtraTime(-3);
         bombSound.play().catch(() => { }); // Play bomb sound
     }
 }
 class BadObject extends FallingObject {
     constructor(speed = Math.random() * 2 + 3) {
-        super(speed, -1, negativeObjectImages, "#6b0000"); // -1 punto, caida rapida
+        super(speed, 0, negativeObjectImages, "#6b0000", 1.35); // Objeto malo mas grande
     }
     applyEffect(game) {
-        game.score += this.points;
+        game.addExtraTime(-1);
         bombSound.play().catch(() => { });
     }
 }
@@ -351,12 +353,12 @@ class Game {
         else if (rand < 0.002) {
             this.fallingObjects.push(new BombObject(sharedSpeed));
         }
-        else if (rand < 0.009) {
+        else if (rand < 0.016) {
             // Reloj raro: +10s de tiempo al atraparlo.
             this.fallingObjects.push(new ClockObject());
         }
-        else if (rand < 0.406) {
-            // Mayor frecuencia de objetos negativos (~45%).
+        else if (rand < 0.38) {
+            // Frecuencia de objetos negativos ligeramente reducida.
             this.fallingObjects.push(new BadObject(sharedSpeed));
         }
         else {
