@@ -64,7 +64,7 @@ const playerWidth = 297;
 const playerHeight = 276;
 const objectWidth = 60;
 const objectHeight = 60;
-const playerBottomMargin = 150;
+const playerBottomMargin = 0;
 
 let gameSpeed = 1;  // Multiplier for difficulty levels
 const roundDurationSec = 60;
