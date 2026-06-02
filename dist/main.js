@@ -56,8 +56,8 @@ let initialsInput = document.getElementById("initials-input");
 let saveScoreButton = document.getElementById("save-score-button");
 let arcadeBody = document.getElementById("arcade-body");
 let gameOverPhaseTimeoutId = null;
-const playerWidth = 132;
-const playerHeight = 122;
+const playerWidth = 198;
+const playerHeight = 183;
 const objectWidth = 60;
 const objectHeight = 60;
 const playerBottomMargin = 150;
@@ -301,7 +301,7 @@ class BadObject extends FallingObject {
 }
 class ClockObject extends FallingObject {
     constructor() {
-        super(Math.random() * 1 + 1.5, 1, [clockObjectImage], "#1d4ed8"); // caida lenta
+        super(Math.random() * 2 + 3, 1, [clockObjectImage], "#1d4ed8"); // caida mas rapida
     }
     applyEffect(game) {
         game.score += this.points;
@@ -319,7 +319,7 @@ class Game {
         this.difficultyMultiplier = 1;
         this.highScore = this.loadHighScore();
         this.lastSpawnTime = performance.now();
-        this.minSpawnIntervalMs = 650;
+        this.minSpawnIntervalMs = 260;
         this.startTimeMs = performance.now();
         this.roundDurationMs = roundDurationSec * 1000;
         this.timeLeftSec = roundDurationSec;
@@ -343,33 +343,38 @@ class Game {
     }
     spawnRandomObject() {
         const rand = Math.random();
-        // Velocidad un poco mas rapida para positivos (sin multiplicador de dificultad).
-        const slowSpeed = Math.random() * 1.1 + 1.9;
-        // Velocidad mas suave para negativos (escala con dificultad).
-        const fastSpeed = this.difficultyMultiplier * (Math.random() * 1.3 + 2.1);
+        // Velocidad base compartida para objetos buenos y daninos.
+        const sharedSpeed = Math.random() * 2 + 3;
         if (rand < 0.001) {
             this.fallingObjects.push(new GoldenObject());
         }
         else if (rand < 0.002) {
-            this.fallingObjects.push(new BombObject(fastSpeed));
+            this.fallingObjects.push(new BombObject(sharedSpeed));
         }
-        else if (rand < 0.03) {
+        else if (rand < 0.009) {
             // Reloj raro: +10s de tiempo al atraparlo.
             this.fallingObjects.push(new ClockObject());
         }
-        else if (rand < 0.42) {
+        else if (rand < 0.406) {
             // Mayor frecuencia de objetos negativos (~45%).
-            this.fallingObjects.push(new BadObject(fastSpeed));
+            this.fallingObjects.push(new BadObject(sharedSpeed));
         }
         else {
-            this.fallingObjects.push(new FallingObject(slowSpeed));
+            this.fallingObjects.push(new FallingObject(sharedSpeed));
         }
     }
     createObject(currentTime) {
         const forcedSpawn = currentTime - this.lastSpawnTime >= this.minSpawnIntervalMs;
-        const randomSpawn = Math.random() < 0.05;
+        const randomSpawn = Math.random() < 0.2;
         if (forcedSpawn || randomSpawn) {
-            this.spawnRandomObject();
+            let spawnCount = 1;
+            if (Math.random() < 0.4)
+                spawnCount += 1;
+            if (Math.random() < 0.18)
+                spawnCount += 1;
+            for (let i = 0; i < spawnCount; i++) {
+                this.spawnRandomObject();
+            }
             this.lastSpawnTime = currentTime;
         }
     }
