@@ -30,21 +30,17 @@ function pickRandomImage(pool) {
 }
 const positiveObjectImages = [
     createImageAsset("imagenes/Clip mariposa.png"),
-    createImageAsset("imagenes/Clip.png"),
     createImageAsset("imagenes/Despachador.png"),
-    createImageAsset("imagenes/Estrella.png"),
     createImageAsset("imagenes/folder.png"),
-    createImageAsset("imagenes/Hoja blanca.png"),
-    createImageAsset("imagenes/Nube.png"),
-    createImageAsset("imagenes/regla.png"),
-    createImageAsset("imagenes/Sobre.png")
+    createImageAsset("imagenes/Hoja transp-azul.png")
 ];
 const negativeObjectImages = [
-    createImageAsset("imagenes/Pin.png"),
-    createImageAsset("imagenes/Rayo.png"),
-    createImageAsset("imagenes/sacapuntas.png"),
-    createImageAsset("imagenes/Tijeras.png"),
-    createImageAsset("imagenes/viruta de lapiz.png")
+    createImageAsset("imagenes/Asterisco-rojo.png"),
+    createImageAsset("imagenes/Pin-resorte.png"),
+    createImageAsset("imagenes/Pin-rojo.png"),
+    createImageAsset("imagenes/Rayo-rojo.png"),
+    createImageAsset("imagenes/Tijeras-roja.png"),
+    createImageAsset("imagenes/viruta de lapiz-roja.png")
 ];
 const clockObjectImage = createImageAsset("imagenes/Reloj.png");
 let scoreElement = document.getElementById("score");
@@ -56,8 +52,8 @@ let initialsInput = document.getElementById("initials-input");
 let saveScoreButton = document.getElementById("save-score-button");
 let arcadeBody = document.getElementById("arcade-body");
 let gameOverPhaseTimeoutId = null;
-const playerWidth = 198;
-const playerHeight = 183;
+const playerWidth = 99;
+const playerHeight = 92;
 const objectWidth = 60;
 const objectHeight = 60;
 const playerBottomMargin = 150;
