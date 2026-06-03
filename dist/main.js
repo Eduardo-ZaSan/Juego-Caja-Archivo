@@ -28,7 +28,7 @@ function pickRandomImage(pool) {
         return null;
     return pool[Math.floor(Math.random() * pool.length)];
 }
-const hojaAmaObjectImage = createImageAsset("imagenes/Hoja transp-ama.png");
+const hojaAmaObjectImage = createImageAsset("imagenes/Hoja blanca.png");
 const positiveObjectImages = [
     createImageAsset("imagenes/Clip mariposa.png"),
     createImageAsset("imagenes/Despachador.png"),
@@ -140,7 +140,7 @@ class Player {
         this.visualScaleY = 1;
         this.x = canvas.width / 2 - playerWidth / 2;
         this.y = canvas.height - playerHeight - playerBottomMargin;
-        this.speed = Math.max(6, Math.floor(window.innerWidth * 0.0019)) * gameSpeed;
+        this.speed = Math.max(9, Math.floor(window.innerWidth * 0.0028)) * gameSpeed;
     }
     moveLeft() {
         this.x = Math.max(0, this.x - this.speed);

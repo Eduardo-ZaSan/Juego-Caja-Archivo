@@ -31,7 +31,7 @@ function pickRandomImage(pool: HTMLImageElement[]): HTMLImageElement | null {
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
-const hojaAmaObjectImage = createImageAsset("imagenes/Hoja transp-ama.png");
+const hojaAmaObjectImage = createImageAsset("imagenes/Hoja blanca.png");
 
 const positiveObjectImages: HTMLImageElement[] = [
     createImageAsset("imagenes/Clip mariposa.png"),
@@ -171,7 +171,7 @@ class Player implements IGameObject {
     constructor() {
         this.x = canvas.width / 2 - playerWidth / 2;
         this.y = canvas.height - playerHeight - playerBottomMargin;
-        this.speed = Math.max(6, Math.floor(window.innerWidth * 0.0019)) * gameSpeed;
+        this.speed = Math.max(9, Math.floor(window.innerWidth * 0.0028)) * gameSpeed;
     }
 
     moveLeft() {
