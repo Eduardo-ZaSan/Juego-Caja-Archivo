@@ -31,11 +31,13 @@ function pickRandomImage(pool: HTMLImageElement[]): HTMLImageElement | null {
     return pool[Math.floor(Math.random() * pool.length)];
 }
 
+const hojaAmaObjectImage = createImageAsset("imagenes/Hoja transp-ama.png");
+
 const positiveObjectImages: HTMLImageElement[] = [
     createImageAsset("imagenes/Clip mariposa.png"),
     createImageAsset("imagenes/Despachador.png"),
     createImageAsset("imagenes/folder.png"),
-    createImageAsset("imagenes/Hoja transp-azul.png")
+    hojaAmaObjectImage
 ];
 
 const negativeObjectImages: HTMLImageElement[] = [
@@ -310,6 +312,9 @@ class FallingObject implements IGameObject {
         this.rotation = 0;
         this.rotationSpeed = (Math.random() * 0.08 + 0.03) * (Math.random() < 0.5 ? -1 : 1);
         this.sprite = pickRandomImage(spritePool);
+        if (this.points === 1 && this.sprite === hojaAmaObjectImage) {
+            this.points = 5;
+        }
         this.fallbackColor = fallbackColor;
     }
 
